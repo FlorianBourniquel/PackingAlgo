@@ -82,6 +82,36 @@ class Fit:
         return f"{self.__class__.__name__}\n{len(self.bin)}\n" + '\n'.join(map(str, self.bin))
 
 
+class BestFit(Fit):
+    """
+        The bins in self.bin are sorted in ascending order
+    """
+    def __init__(self, size, items):
+        super().__init__(size, items)
+
+    def apply(self):
+        self.add_bin()
+        for item in self.items:
+            position = self.find_best_fit(item)
+            if position == -1:
+                target_bin = Bin(self.size)
+            elif position < len(self.bin):
+                target_bin = self.bin.pop(position)
+            target_bin.add_item(item)
+            bisect.insort_right(self.bin, target_bin)
+        return self
+
+    def find_best_fit(self, item):
+        lo, hi = 0, len(self.bin)
+        while lo < hi:
+            mid = (lo + hi) // 2
+            if not self.bin[mid].have_enough_space_available(item):
+                hi = mid
+            else:
+                lo = mid + 1
+        return lo - 1
+
+
 class AlmostWorstFit(Fit):
     """
         The bins in self.bin are sorted in ascending order
