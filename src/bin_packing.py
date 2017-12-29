@@ -2,6 +2,7 @@ import bisect
 import glob
 import os
 from abc import abstractmethod
+from typing import List
 
 
 def parse(file):
@@ -69,7 +70,7 @@ class Fit:
     def __init__(self, size, items):
         self.size = size
         self.items = items
-        self.bin = []
+        self.bin: List[Bin] = []
 
     def add_bin(self):
         self.bin.append(Bin(self.size))
@@ -82,13 +83,36 @@ class Fit:
         return f"{self.__class__.__name__}\n{len(self.bin)}\n" + '\n'.join(map(str, self.bin))
 
 
+class FirstFit(Fit):
+    def apply(self):
+        self.add_bin()
+        for item in self.items:
+            for currentBin in self.bin:
+                if currentBin.have_enough_space_available(item):
+                    currentBin.add_item(item)
+                    break
+            else:
+                self.add_bin()
+                self.bin[-1].add_item(item)
+        return self
+
+
+class NextFit(Fit):
+    def apply(self):
+        self.add_bin()
+        for item in self.items:
+            if self.bin[-1].have_enough_space_available(item):
+                self.bin[-1].add_item(item)
+            else:
+                self.add_bin()
+                self.bin[-1].add_item(item)
+        return self
+
+
 class BestFit(Fit):
     """
         The bins in self.bin are sorted in ascending order
     """
-    def __init__(self, size, items):
-        super().__init__(size, items)
-
     def apply(self):
         self.add_bin()
         for item in self.items:
@@ -116,14 +140,11 @@ class AlmostWorstFit(Fit):
     """
         The bins in self.bin are sorted in ascending order
     """
-    def __init__(self, size, items):
-        super().__init__(size, items)
-
     def apply(self):
         self.add_bin()
         for item in self.items:
             position = self.find_worst_fit(item)
-            if position == len(self.bin):
+            if position == -1:
                 target_bin = Bin(self.size)
             elif position < len(self.bin) - 1 and self.bin[position + 1].have_enough_space_available(item):
                 target_bin = self.bin.pop(position + 1)
@@ -137,24 +158,21 @@ class AlmostWorstFit(Fit):
         for i, b in enumerate(self.bin):
             if b.have_enough_space_available(item):
                 return i
-        return len(self.bin)
+        return -1
 
 
 class WorstFit(Fit):
     """
         The bins in self.bin are sorted in ascending order
     """
-    def __init__(self, size, items):
-        super().__init__(size, items)
-
     def apply(self):
         self.add_bin()
         for item in self.items:
             position = self.find_worst_fit(item)
-            if position < len(self.bin):
-                target_bin = self.bin.pop(position)
-            elif position == len(self.bin):
+            if position == -1:
                 target_bin = Bin(self.size)
+            elif position < len(self.bin):
+                target_bin = self.bin.pop(position)
             target_bin.add_item(item)
             bisect.insort_right(self.bin, target_bin)
         return self
@@ -163,7 +181,7 @@ class WorstFit(Fit):
         for i, b in enumerate(self.bin):
             if b.have_enough_space_available(item):
                 return i
-        return len(self.bin)
+        return -1
 
 
 def main():
