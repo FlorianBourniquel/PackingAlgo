@@ -1,6 +1,7 @@
 import bisect
 import glob
 import os
+import time
 from abc import abstractmethod
 from typing import List
 
@@ -10,10 +11,12 @@ def parse(file):
     return int(size), list(map(int, items.replace('.\n', '').split(',')))
 
 
-def output(filename, fit):
+def output(filename, fit, duration):
     """
         Output format:
             the name of the algorithm
+            the name of the input file
+            the required time to compute the solution
             n the number of bin used
             On the following n lines, the items in each bin separated by a ", "
             the file ends with a \n
@@ -21,7 +24,7 @@ def output(filename, fit):
     if not os.path.exists('../output'):
         os.mkdir('../output')
     with open(f'../output/{fit.__class__.__name__}-{os.path.basename(filename)}', 'w') as out:
-        out.write(f'{fit}\n')
+        out.write(f'{fit.__class__.__name__}\n{os.path.basename(filename)}\n{duration}\n{fit}\n')
 
 
 class BinOverflow(Exception):
@@ -80,7 +83,7 @@ class Fit:
         pass
 
     def __str__(self):
-        return f"{self.__class__.__name__}\n{len(self.bin)}\n" + '\n'.join(map(str, self.bin))
+        return f"{len(self.bin)}\n" + '\n'.join(map(str, self.bin))
 
 
 class FirstFit(Fit):
@@ -113,6 +116,7 @@ class BestFit(Fit):
     """
         The bins in self.bin are sorted in ascending order
     """
+
     def apply(self):
         self.add_bin()
         for item in self.items:
@@ -140,6 +144,7 @@ class AlmostWorstFit(Fit):
     """
         The bins in self.bin are sorted in ascending order
     """
+
     def apply(self):
         self.add_bin()
         for item in self.items:
@@ -158,6 +163,7 @@ class WorstFit(Fit):
     """
         The bins in self.bin are sorted in ascending order
     """
+
     def apply(self):
         self.add_bin()
         for item in self.items:
@@ -175,7 +181,9 @@ def main():
         with open(filename) as source:
             size, items = parse(source)
             for algorithm in Fit.algorithms:
-                output(filename, algorithm(size, items).apply())
+                start = time.clock()
+                solution = algorithm(size, items).apply()
+                output(filename, solution, time.clock() - start)
 
 
 if __name__ == '__main__':
