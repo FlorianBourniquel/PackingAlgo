@@ -183,7 +183,7 @@ def main():
             for algorithm in Fit.algorithms:
                 start = time.clock()
                 solution = algorithm(size, items).apply()
-                output(filename, solution, time.clock() - start)
+                output(filename, solution, (time.clock() - start) * 1000)
 
 
 if __name__ == '__main__':
