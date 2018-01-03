@@ -15,7 +15,7 @@ def generate_random_example( dir, name):
         output += str(random.randint(1, 1000)) + ", "
     output += str(random.randint(1, 1000)) + "."
 
-    example_file.write(output)
+    example_file.write(output + str(nb_object) +".txt")
     example_file.close()
 
 generate_random_example("../example", "example")
