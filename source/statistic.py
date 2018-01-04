@@ -43,7 +43,5 @@ def main():
         score.write('\n')
 
 
-
-
 if __name__ == '__main__':
     main()
