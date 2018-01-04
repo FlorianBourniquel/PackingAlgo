@@ -1,3 +1,4 @@
+import glob
 import random
 import os
 
@@ -67,8 +68,14 @@ def generate_random_example():
 
     for i in range(nb_examples):
         example = random_example(bin_size, min_object_size, max_object_size, nb_objects)
-        example_file = open("../random_example/example" + str(i) + "-" + str(nb_objects), 'w')
+        example_file = open("../random_example/exemples" + str(i) + "-" + str(nb_objects) + ".txt", 'w')
         example_file.write(str(example))
         example_file.close()
 
-generate_random_example()
+
+
+def main():
+    generate_random_example()
+
+if __name__ == '__main__':
+    main()

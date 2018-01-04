@@ -1,7 +1,7 @@
 import sys
 
-from src.fit_strategy import fit_strategy
-from src.bin import bin
+from source.fit_strategy import fit_strategy
+from source.bin import bin
 
 class worst_fit(fit_strategy):
 

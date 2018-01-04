@@ -1,4 +1,4 @@
-from src.items import object
+from source.items import object
 
 class example:
 

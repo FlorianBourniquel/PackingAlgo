@@ -2,8 +2,10 @@ import bisect
 import glob
 import os
 import time
+import sys
 from abc import abstractmethod
 from typing import List
+
 
 
 def parse(file):
@@ -176,8 +178,26 @@ class WorstFit(Fit):
         return self
 
 
+def generate_random_example():
+    print("Entrer la taille des bins")
+    bin_size = int(input())
+    if bin_size <= 0:
+        raise Exception("Invalid argument for the minimal object size")
+
+    print("Entrer la taille minimale des objets")
+    min_object_size = int(input())
+    if 0 >= min_object_size or min_object_size > bin_size:
+        raise Exception("Invalid argument for the minimal object size")
+
+    print("Entrer la taille maximale des objets")
+    max_object_size = int(input())
+    if 0 >= max_object_size or max_object_size > bin_size or max_object_size < min_object_size:
+        raise Exception("Invalid argument for the maximal object size")
+
+
+
 def main():
-    for filename in glob.glob('../example/*.txt'):
+    for filename in glob.glob('../' + str(sys.argv[1]) + '/*.txt'):
         with open(filename) as source:
             size, items = parse(source)
             for algorithm in Fit.algorithms:
