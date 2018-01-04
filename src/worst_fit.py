@@ -11,8 +11,8 @@ class worst_fit(fit_strategy):
     def execute_strategy(self):
         self.bins.append(bin(self.example.bin_size))
         for item in self.example.items:
+            min = sys.maxsize
             for a_bin in self.bins:
-                min = sys.maxsize
                 if a_bin.level < min:
                     min = a_bin.level
                     bin_minlevel = a_bin
