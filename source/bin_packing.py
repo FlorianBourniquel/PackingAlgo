@@ -206,5 +206,6 @@ def main():
                 output(filename, solution, (time.clock() - start) * 1000)
 
 
+
 if __name__ == '__main__':
     main()
